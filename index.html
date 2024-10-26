@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-UA-compatible" content="IE=edge" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Search Application</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <h1>Image Search Application</h1>
+
+  <form name="form" action="">
+    <input id="search-input" placeholder="Search for images" type="text" />
+    
+    <button id="search-button">Search</button>
+  </form>
+
+    <select id="language-select">
+      <option value="">Select Language</option>
+      <option value="English">English</option>
+      <option value="Kannada">Kannada</option>
+      <option value="Hindi">Hindi</option>
+      <option value="Telugu">Telugu</option>
+      <option value="Tamil">Tamil</option>
+      <option value="Malayalam">Malayalam</option>
+    </select>
+  
+
+  <div class="search-results">
+    <div class="search-result">
+      <img src="https://images.unsplash.com/photo-1544513702-7a17609eb3f3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="boy" />
+      <a href="https://unsplash.com/s/photos/a-boy" target="_blank">A boy</a>
+      <button class="delete-button">Delete</button>
+    </div>
+    <div class="search-result">
+      <img src="https://images.unsplash.com/photo-1534361960057-19889db9621e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A dog" />
+      <a href="https://unsplash.com/s/photos/dog" target="_blank">A Dog</a>
+      <button class="delete-button">Delete</button>
+    </div>
+    <div class="search-result">
+      <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80" alt="my-dream-house" />
+      <a href="https://unsplash.com/photos/hHz4yrvxwlA" target="_blank">My dream house</a>
+      <button class="delete-button">Delete</button>
+    </div>
+  </div>
+
+  <button id="show-more-button">Show more</button>
+  <script src="./script.js"></script>
+</body>
+
+</html>
