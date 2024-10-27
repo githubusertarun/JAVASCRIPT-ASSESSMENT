@@ -1,101 +1,114 @@
 let page = 1;
+const itemsPerPage = 10;
+let allResults = [];
+let displayedResults = [];
 
 const searchResults = document.querySelector(".search-results");
 const searchInput = document.getElementById("search-input");
 const languageSelect = document.getElementById("language-select");
-let searchInputValue = "";
+const showMoreButton = document.getElementById("show-more-button");
 
 // Predefined set of languages
 const languages = ["English", "Kannada", "Hindi", "Telugu", "Tamil", "Malayalam"];
 
-function getImages() {
-  searchInputValue = searchInput.value;
-
-  // Get the selected language
-  const selectedLanguage = languageSelect.value;
-
-  if (searchInputValue === "") {
-    window.alert("Oops!....Empty query. You need to input a value");
-    return; // Prevent further execution if input is empty
-  }
-
-  const API = `https://api.unsplash.com/search/photos/?query=${searchInputValue}&client_id=QGtQu40-81LdBQtPOjxktYTtKy3b1OIAfw-tsB7XELU&page=${page}&orientation=landscape`;
-
-  if (page === 1) {
-    searchResults.innerHTML = "";
-  }
-
-  fetch(API)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not okay");
-      }
-      return response.json();
-    })
-    .then((response) => {
-      if (response.results.length === 0) {
-        window.alert("No results found for your query.");
-        return; // Stop if no results
-      }
-
-      response.results.forEach((result) => {
-        const searchResult = document.createElement("div");
-        searchResult.classList.add("search-result");
-
-        const image = document.createElement("img");
-        image.src = result.urls.small;
-        image.alt = result.alt_description;
-
-        const anchor = document.createElement("a");
-        anchor.href = result.links.html;
-        anchor.target = "_blank";
-        anchor.textContent = result.alt_description;
-
-        // Generate a random number for likes between 1 and 1000
-        const likes = Math.floor(Math.random() * 1000) + 1;
-        const likesDisplay = document.createElement("p");
-        likesDisplay.textContent = `${likes} Likes`; // Display likes
-
-        // Display the selected language
-        const languageDisplay = document.createElement("p");
-        languageDisplay.textContent = `Language: ${selectedLanguage}`; // Display selected language
-
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
-        deleteButton.classList.add("delete-button");
-
-        // Add event listener to delete the card
-        deleteButton.addEventListener("click", () => {
-          searchResult.remove();
-        });
-
-        // Append elements to the search result
-        searchResult.append(image);
-        searchResult.append(anchor);
-        searchResult.append(likesDisplay); // Append likes display
-        searchResult.append(languageDisplay); // Append language display
-        searchResult.append(deleteButton); // Append the delete button to the card
-        searchResults.append(searchResult);
-      });
-
-      page++;
-
-      // Show the "Show more" button if more than one page of results
-      if (response.total_pages > page) {
-        document.getElementById("show-more-button").style.display = "block";
-      } else {
-        document.getElementById("show-more-button").style.display = "none"; // Hide if no more pages
-      }
-    })
-    .catch((err) => console.log(err));
+// Function to get random likes
+function getRandomLikes() {
+  return Math.floor(Math.random() * 1000) + 1;
 }
 
-document.querySelector("form").addEventListener("submit", (e) => {
-  e.preventDefault();
+// Function to get a random language
+function getRandomLanguage() {
+  return languages[Math.floor(Math.random() * languages.length)];
+}
+
+// Function to fetch data from JSON Placeholder API
+function fetchData() {
+  const API_URL = `https://jsonplaceholder.typicode.com/photos?_limit=50`;
+
+  fetch(API_URL)
+    .then(response => response.json())
+    .then(data => {
+      allResults = data.map(item => ({
+        ...item,
+        likes: getRandomLikes(),
+        language: getRandomLanguage(),
+      }));
+      filterAndDisplayResults();
+    })
+    .catch(error => console.error("Error fetching data:", error));
+}
+
+// Function to filter and display results based on search input and language selection
+function filterAndDisplayResults() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedLanguage = languageSelect.value;
+
+  displayedResults = allResults.filter(item => {
+    const matchesSearchTerm = item.title.toLowerCase().includes(searchTerm);
+    const matchesLanguage = selectedLanguage === "all" || item.language === selectedLanguage;
+    return matchesSearchTerm && matchesLanguage;
+  });
+
+  displayResults();
+}
+
+// Function to display results with pagination
+function displayResults() {
+  searchResults.innerHTML = ""; // Clear previous results
+
+  const start = (page - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const resultsToDisplay = displayedResults.slice(0, end);
+
+  resultsToDisplay.forEach(result => {
+    const searchResult = document.createElement("div");
+    searchResult.classList.add("search-result");
+
+    const image = document.createElement("img");
+    image.src = result.thumbnailUrl;
+    image.alt = result.title;
+
+    const anchor = document.createElement("a");
+    anchor.href = "#";
+    anchor.textContent = result.title;
+
+    const likesDisplay = document.createElement("p");
+    likesDisplay.textContent = `${result.likes} Likes`;
+
+    const languageDisplay = document.createElement("p");
+    languageDisplay.textContent = `Language: ${result.language}`;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.classList.add("delete-button");
+    deleteButton.addEventListener("click", () => {
+      searchResult.remove();
+    });
+
+    searchResult.append(image, anchor, likesDisplay, languageDisplay, deleteButton);
+    searchResults.appendChild(searchResult);
+  });
+
+  // Update "Show more" button visibility
+  showMoreButton.style.display = end < displayedResults.length ? "block" : "none";
+}
+
+// Event listeners for search and filter inputs
+searchInput.addEventListener("input", () => {
   page = 1;
-  getImages();
+  filterAndDisplayResults();
 });
 
-document.getElementById("show-more-button").addEventListener("click", () => {
-  getImages();
+languageSelect.addEventListener("change", () => {
+  page = 1;
+  filterAndDisplayResults();
 });
+
+// Event listener for the "Show more" button
+showMoreButton.addEventListener("click", () => {
+  page++;
+  displayResults();
+});
+
+// Initial fetch
+fetchData();
